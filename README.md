@@ -235,7 +235,7 @@ schema.isValid({ lesson1: {
 }, 
   lesson2: {
     part1: {
-      lesson: 'beba',
+      lesson: 'history',
       date: 11.02.12,
       grade: 4,
     },
