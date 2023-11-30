@@ -36,12 +36,18 @@ test('task2', () => {
 
 test('task3', () => {
   const v = new Validator();
-  const schema = v.array().custom((element) => (element % 2) === 0);
+  const schema1 = v.array().custom((element) => (element % 2) === 0);
 
-  assert.equal(schema.isValid([2, 4]), true);
-  assert.equal(schema.isValid([1, 2]), false);
-  assert.equal(schema.isValid([1, 2, 1.2]), false);
-  assert.equal(schema.isValid([2, 4, 55556, 6, 78]), true);
+  assert.equal(schema1.isValid([2, 4]), true);
+  assert.equal(schema1.isValid([1, 2]), false);
+  assert.equal(schema1.isValid([1, 2, 1.2]), false);
+  assert.equal(schema1.isValid([2, 4, 55556, 6, 78]), true);
+
+  const schema2 = v.array().custom((element) => Array.isArray(element));
+  assert.equal(schema2.isValid([[1], [2]]), true);
+  assert.equal(schema2.isValid([1, 2]), false);
+  assert.equal(schema2.isValid([1, 2, 1.2]), false);
+  assert.equal(schema2.isValid([[122, 2], [2, 1, 2, [2, 2]]]), true);
 });
 
 test('task4', () => {
@@ -72,6 +78,6 @@ test('task5', () => {
     }
   });
 
-  assert.equal(schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 5 }}} }), true);
-  assert.equal(schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 'gg' }}} }), false);
+  assert.equal(schema.isValid({ num: 54, obj: { array: [1, 2], innerObj: { num: 2, deepestObj: { num: 5 } } } }), true);
+  assert.equal(schema.isValid({ num: 54, obj: { array: [1, 2], innerObj: { num: 2, deepestObj: { num: 'gg' } } } }), false);
 });
