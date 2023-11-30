@@ -64,7 +64,7 @@ schema1.isValid({}); // false;
 
 const schema2 = v.array().allIntegers();
 schema1.isValid([]); // true;
-schema1.isValid([1,2]); // true;
+schema1.isValid([1, 2]); // true;
 schema1.isValid([12, 'b']); // false;
 schema1.isValid({}); // false;
 schema1.isValid([1.2, 1, 2]); // false;
@@ -78,6 +78,7 @@ schema1.isValid([122n, 0]); // true;
 ```javascript
 const v = new Validator();
 const schema1 = v.array().custom((element) => (element % 2) === 0);
+// 
 
 schema1.isValid([1, 2]); // false;
 schema1.isValid([2, 4, 8, 12]); // true;
