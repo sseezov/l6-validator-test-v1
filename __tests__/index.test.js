@@ -8,69 +8,70 @@ test('task1', () => {
   const validator = new Validator();
   const schema = validator.number();
 
-  assert.equal(schema.isValid(null), false); // false
-  assert.equal(schema.isValid(''), false); // false
-  assert.equal(schema.isValid(true), false); // false
-  assert.equal(schema.isValid(123), true); // true
-  assert.equal(schema.isValid(0), true); // true
+  assert.equal(schema.isValid(null), false);
+  assert.equal(schema.isValid(''), false);
+  assert.equal(schema.isValid(true), false);
+  assert.equal(schema.isValid(123), true);
+  assert.equal(schema.isValid(0), true);
+  assert.equal(schema.isValid(2), true);
+  assert.equal(schema.isValid(-3), true);
+  assert.equal(schema.isValid(4.1), true);
 });
 
 test('task2', () => {
-  const validator = new Validator();
-  const schema1 = validator.number().even();
-  const schema2 = validator.number().odd();
+  const v = new Validator();
+  const schema1 = v.array();
+  const schema2 = v.array().allIntegers();
 
-  assert.equal(schema1.isValid(''), false);
-  assert.equal(schema1.isValid(2), true);
-  assert.equal(schema2.isValid(2), false);
-  assert.equal(schema2.isValid(3), true);
+  assert.equal(schema1.isValid([]), true);
+  assert.equal(schema1.isValid([1, 2]), true);
+  assert.equal(schema1.isValid([1, 2, 1.2]), true);
+  assert.equal(schema1.isValid(12), false);
+  assert.equal(schema1.isValid({}), false);
+
+  assert.equal(schema2.isValid([]), true);
+  assert.equal(schema2.isValid([1, 2]), true);
+  assert.equal(schema2.isValid([1, 2, 3, 6.7]), false);
 });
 
 test('task3', () => {
-  const validator = new Validator();
-  const schema = validator.array();
+  const v = new Validator();
+  const schema = v.array().custom((element) => (element % 2) === 0);
 
-  assert.equal(schema.isValid('Hello!'), false);
-  assert.equal(schema.isValid(123), false);
-  assert.equal(schema.isValid([]), true);
-  assert.equal(schema.isValid([1, 23, 4]), true);
+  assert.equal(schema.isValid([2, 4]), true);
+  assert.equal(schema.isValid([1, 2]), false);
+  assert.equal(schema.isValid([1, 2, 1.2]), false);
+  assert.equal(schema.isValid([2, 4, 55556, 6, 78]), true);
 });
 
 test('task4', () => {
-  const validator = new Validator();
-  const schema1 = validator.array().length(4);
-  const schema2 = validator.array().length(12312312455434);
+  const v = new Validator();
 
-  assert.equal(schema1.isValid(null), false);
-  assert.equal(schema1.isValid([]), false);
-  assert.equal(schema1.isValid([1, 2, 3, 4]), true);
-  assert.equal(schema2.isValid([]), false);
-  assert.equal(schema2.isValid([1, 23, 4, 5]), false);
+  const schema = v.object().shape({
+    num: v.number(),
+    array: v.array().allIntegers(),
+  });
+
+  assert.equal(schema.isValid({ num: 54, array: [1, 2, 3, 5, 65, 2] }), true);
+  assert.equal(schema.isValid({ num: 2, array: [1, 2, '4'] }), false);
 });
 
 test('task5', () => {
-  const validator = new Validator();
-  const schema1 = validator.object().shape({
-    id: validator.number().odd(),
-    basket: validator.array().length(3),
-  });
-  const schema2 = validator.object().shape({
-    id: validator.number().even(),
-    basket: validator.array().length(1231233),
-  });
-  const schema3 = validator.object().shape({
-    id: validator.number().even(),
-    basket: validator.array().length(2),
-    payment: validator.array().length(2),
+  const v = new Validator();
+
+  const schema = v.object().shape({
+    num: v.number(),
+    obj: {
+      array: v.array().allIntegers(),
+      innerObj: {
+        num: 2,
+        deepestObj: {
+          num: 5
+        }
+      }
+    }
   });
 
-  assert.equal(schema1.isValid({ id: 11, basket: ['potatos', 'tomatos', 'oranges'] }), true);
-  assert.equal(schema1.isValid({ id: 12, basket: ['potatos', 'tomatos', 'oranges'] }), false);
-  assert.equal(schema1.isValid({}), false);
-  assert.equal(schema2.isValid({ id: 11, basket: [] }), false);
-  assert.equal(schema2.isValid([1, 23, 4, 5]), false);
-  assert.equal(schema2.isValid(2), false);
-  assert.equal(schema3.isValid({ id: 16, basket: ['apple', 'cucumber'], payment: ['10 dollars', '10 cents'] }), true);
-  assert.equal(schema3.isValid({ id: 17, basket: ['apple', 'cucumber'], payment: ['10 dollars', '10 cents'] }), false);
-  assert.equal(schema3.isValid({ id: 16, basket: ['apple'], payment: ['10 dollars', '10 cents'] }), false);
+  assert.equal(schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 5 }}} }), true);
+  assert.equal(schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 'gg' }}} }), false);
 });

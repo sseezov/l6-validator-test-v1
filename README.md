@@ -33,77 +33,55 @@ node src/index.js
 
 ## 1 задача
 
-Вам необходимо создать валидатор, который способен принимать аргумент и проводить его проверку на соответствие определенным условиям. В данной задаче мы ограничиваемся валидацией оценки. Для этого в вашем валидаторе должен быть метод `grade()`, который создает экземпляр валидатора чисел. Этот экземпляр обладает методом `isValid()`, который принимает данные на вход и возвращает значение true или false в зависимости от того, являются ли входные данные числом, которое соответствует формату оценки. То есть число должно быть в пределах от 2 до 5 и быть целым.
+Вам необходимо создать валидатор, который способен принимать аргумент и проводить его проверку на соответствие определенным условиям. В данной задаче мы ограничиваемся валидацией чисел. Для этого в вашем валидаторе должен быть метод `number()`, который создает экземпляр валидатора чисел. Этот экземпляр обладает методом `isValid()`, который принимает данные на вход и возвращает значение true или false в зависимости от того, являются ли входные данные числом.
 
 ```javascript
 const v = new Validator();
-const schema = v.grade();
+const schema = v.number();
 
 schema.isValid(null); // false
 schema.isValid(''); // false
 schema.isValid(true); // false
-schema.isValid(123); // false
-schema.isValid(0); // false
+schema.isValid(123); // true
+schema.isValid(0); // true
 schema.isValid(2); // true
-schema.isValid(-3); // false
-schema.isValid(4.1); // false
-schema.isValid(5); // true
+schema.isValid(-3); // true
+schema.isValid(4.1); // true
 ```
-
-После добавления методов `grade()` и `isValid()`, экземпляр валидатора будет проверять является ли аргумент целым числом в пределах от 2 до 5 включительно.
 
 ## 2 задача
 
-Вам необходимо создать валидатор записей в журнал, который будет возвращаться при вызове метода  `lessonData()`, который возвращает экземпляр валидатора журнальной записи урока. Этот экземпляр обладает методом `isValid()`, который принимает данные на вход и возвращает значение true или false. Валидатор `lessonData()` возвращает true, если на вход приходит объект, следующего формата:
-
-```javascript
-{
-  lesson: 'programming',
-  date: '11.02.12',
-  grade: 3,
-}
-```
-
-В данном объекте всегда должно быть три указанных ключа (`lesson, date, grade`), значением в первом должна быть строка, во втором строка, которая состоит из 3 двухзначных чисел, разделенных точкой. Значением в третьем ключе должна быть оценка, которая валидируется валидатором оценок.
+Вам необходимо создать валидатор массивов, который будет возвращаться при вызове метода  `array()`. Этот экземпляр обладает методом `isValid()`, который принимает данные на вход и возвращает значение true или false, в том случае, если на вход нам пришел массив. Валидатор `array()` также должен иметь метод `allIntegers()`, который проверяет, что все элементы массива являются целыми числами.
 
 ```javascript
 const v = new Validator();
-const schema = v.lessonData();
 
-schema.isValid(4); // false;
-schema.isValid({ lesson: 'programming', date: 11.02.12, grade: 3 }); // true;
-schema.isValid({ lesson: 'programming', date: 11.02.12 }); // false;
-schema.isValid({ lesson: 'programming', date: 11.02.12, grade: 3, playingGames: true}); // false;
-schema.isValid({ lesson: 'programming', date: 111.02.12, grade: 3 }); // false;
-schema.isValid({ lesson: 'programming', date: 11.02.12, grade: 1 }); // false;
-schema.isValid({ lesson: 'programming', date: 11.02.32,  grade: 5 }); // true;
+const schema1 = v.array();
+schema1.isValid([]); // true;
+schema1.isValid([1,2]); // true;
+schema1.isValid(12); // false;
+schema1.isValid({}); // false;
+
+const schema2 = v.array().allIntegers();
+schema1.isValid([]); // true;
+schema1.isValid([1,2]); // true;
+schema1.isValid([12, 'b']); // false;
+schema1.isValid({}); // false;
+schema1.isValid([1.2, 1, 2]); // false;
+schema1.isValid([122n, 0]); // true;
 ```
 
 ## 3 задача
 
-Сделайте валидатор `lessonData()` более строгим, добавив в него валидацию поля `lesson`, которое должно всегда быть одним из указанных значений: `['math', 'english', 'programming', 'history', 'philosophy', 'sports', 'arts']`.
-
-Также необходимо расширить функциональность валидатора `lessonData()`, добавив в него метод `passed(num)`, который добавляет проверку на то, что оценка выше указанного числа. Аргумент может быть только число от 3 до 5, если аргумент не соответствует заданному значению, то применяется аргумент по умолчанию - 3;
+Расширьте функционал валидатора массивов `array()`, добавив в него кастомную валидацию элементов массива. Это означает, что в экземпляр валидатора массивов можно добавить свой валидатор для каждого элемента массива с помощью метода `custom()`. Переданный валидатор должен проверять каждый элемент массива на соответствие определенному условию.
 
 ```javascript
 const v = new Validator();
-const schema1 = v.lessonData();
+const schema1 = v.array().custom((element) => (element % 2) === 0);
 
-schema1.isValid({ lesson: 'programming', date: 11.02.12, grade: 2 }); // true;
-schema1.isValid({ lesson: 'bobaibiba', date: 11.02.12, grade: 3 }); // false;
-schema1.isValid({ lesson: 'history', date: 11.02.12, grade: 6 }); // false;
-schema1.isValid({ lesson: 'sports', date: 11.02.12, grade: 2 }); // true;
-
-const schema2 = v.lessonData().passed(3);
-
-schema2.isValid({ lesson: 'programming', date: 11.02.12, grade: 3 }); // true;
-schema2.isValid({ lesson: 'history', date: 11.02.12, grade: 2 }); // false;
-
-const schema3 = v.lessonData().passed();
-schema3.isValid({ lesson: 'history', date: 11.02.12, grade: 2 }); // true;
-
-const schema4 = v.lessonData().passed(10);
-schema4.isValid({ lesson: 'history', date: 11.02.12, grade: 2 }); // true;
+schema1.isValid([1, 2]); // false;
+schema1.isValid([2, 4, 8, 12]); // true;
+schema1.isValid([1.2]); // false;
 ```
 
 ## 4 задача
@@ -115,21 +93,13 @@ const v = new Validator();
 
 // Позволяет описывать валидацию для свойств объекта
 const schema = v.object().shape({
-  lesson1: v.lessonData().passed(3), // теперь, при валидации объекта с ключом lesson, значение этого ключа пройдет валидацию в соответствии с текущими методами
-  lesson2: v.lessonData().passed(4),
+  num: v.number(), // теперь, при валидации объекта с ключом lesson, значение этого ключа пройдет валидацию в соответствии с текущими методами
+  array: v.array().allIntegers(),
 });
 
-schema.isValid(
-  { lesson1: { lesson: 'history', date: 11.02.12, grade: 3 }, 
-    lesson2: { lesson: 'history', date: 11.02.12, grade: 4 }}); // true
+schema.isValid({ num: 54, array: [1, 2, 3, 5, 65, 2]}); // true
+schema.isValid({ num: 2, array: [1, 2, '4']}); // false
 
-schema.isValid(
-  { lesson1: { lesson: 'history', date: 11.02.12, grade: 2 }, 
-    lesson2: { lesson: 'history', date: 11.02.12, grade: 4 }}); // false
-
-schema.isValid(
-  { lesson1: {  lesson: 'history', date: 11.02.12, grade: 3 }, 
-    lesson2: {  lesson: 'beba', date: 11.02.12,  grade: 4 }}); // false
 ```
 
 ## 5 задача
@@ -139,27 +109,17 @@ schema.isValid(
 ```javascript
 const v = new Validator();
 
-// Позволяет описывать валидацию для свойств объекта
-const schema1 = v.object().shape(
-  { lesson1: v.lessonData().passed(3),
-    lesson2: { part1: v.lessonData()
-               part2: { subpart1: v.grade() }}});
+const schema = v.object().shape({
+  num: v.number(),
+  obj: {
+    array: v.array().allIntegers(),
+    innerObj: {
+      num: 2,
+      deepestObj: {
+        num: 5
+      }
+    }
+  }
+});
 
-schema1.isValid(
-  { lesson1: { lesson: 'history', date: 11.02.12, grade: 3 }, 
-    lesson2: { part1: { lesson: 'history', date: 11.02.12, grade: 4 },
-               part2: { subpart1: 4 }}}); // true
-
-const schema2 = v.object().shape(
-  { lesson1: v.lessonData().passed(4),
-    lesson2: { part1: v.grade(),
-               part2: { subpart1: { subsubpart1: { theEnd: v.grade() }}}}});
-
-schema2.isValid(
-  { lesson1: { lesson: 'history', date: 11.02.12, grade: 3 }, 
-    lesson2: { part1: { lesson: 'history', date: 11.02.12, grade: 4 },
-               part2: { subpart1: 4 }}}); // false
-schema2.isValid(
-  { lesson1: { lesson: 'history', date: 11.02.12, grade: 4 }, 
-    lesson2: { part1: 5,
-               part2: { subpart1: { theEnd: 5 } }}}); // true
+schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 5 }}} }); // true
