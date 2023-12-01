@@ -114,12 +114,12 @@ const schema = v.object().shape({
   obj: {
     array: v.array().allIntegers(),
     innerObj: {
-      num: 2,
+      num: v.number(),
       deepestObj: {
-        num: 5
+        num: v.number()
       }
     }
   }
 });
 
-schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 5 }}} }); // true
+schema.isValid({ num: 54, obj: { array: [1, 2], innerObj: { num: 2, deepestObj: { num: 5 }}} }); // true
