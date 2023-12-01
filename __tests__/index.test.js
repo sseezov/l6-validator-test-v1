@@ -72,6 +72,19 @@ test('task5', () => {
     },
   });
 
-  assert.equal(schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 5 }}} }), true);
-  assert.equal(schema.isValid({ num: 54, obj: { array: [1,2], innerObj: { num: 2, deepestObj: { num: 'gg' }}} }), false);
+  assert.equal(schema.isValid(
+    {
+      num: 54,
+      obj: {
+        array: [1, 2],
+        innerObj: {
+          num: 2,
+          deepestObj: {
+            num: 5,
+          },
+        },
+      },
+    },
+  ), true);
+  assert.equal(schema.isValid({ num: 54, obj: { array: [1, 2], innerObj: { num: 2, deepestObj: { num: 'gg' } } } }), false);
 });
