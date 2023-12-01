@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export default class ObjectSchema {
   constructor(shapes) {
     this.validators = shapes;
@@ -13,22 +15,16 @@ export default class ObjectSchema {
     if (keys.length !== Object.keys(this.validators).length) {
       return false;
     }
-    let validators = value;
-    
-    const iter = (obj, key) => {
-      if ((typeof obj[key] !== 'object') && (obj[key] !== null) && (!Array.isArray(obj))) {
-        return this.validators[key].isValid(obj[key])
+
+    const iter = (obj, key, schema) => {
+      if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) {
+        return schema[key].isValid(obj)
       }
-      if (Array.isArray(obj)) {
-        // return obj[key].isValid(obj)
-      }
-      let value = obj[key];
-      let keys = Object.keys(obj[key])
-      console.log(key,77)
-      validators = validators[key];
-      return keys.map(key => iter(value, key))
+      const keys = Object.keys(obj);
+      const validator = schema[key]
+      return keys.map((key) => iter(obj[key], key, validator))
     }
-    return keys.map((key) => iter(value, key))
+    return _.flattenDeep(keys.map((key) => iter(value[key], key, this.validators))).every(val=>val)
   }
 }
 
